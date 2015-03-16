@@ -1,8 +1,9 @@
 //main.cpp
 
 #include <iostream>
+#include <ifstream>
+#include <string>
 #include <cmath>
-#include <fstream>
 #include <Eigen/Core>
 
 
@@ -27,22 +28,30 @@ struct dataSet{
 void readDataFiles(){
   dataSet irisData;
 
-  char filePath[20] = "../iris_data_files/";
+  const char filePath[20] = "../data/";
 
-  ofstream trainingFile;
-  trainingFile.open ("../iris_data_files/iris_training.dat");
+  const std::string fileNames[3] =
+    {"iris_training.dat",
+    "iris_test.dat",
+    "iris_validation.dat"};
 
-  while (trainingFile.good()){
-    for (unsigned j=1; j < 5; ++j){
-      trainingFile >> irisData.trainingSet.inputs(j, i)
-      getchar();
+  std::ifstream myFile;
+
+  for (unsigned f=1; f <= 3; ++f){
+
+    myFile.open (filePath + fileNames[f].c_str());
+
+    for (unsigned i=1; myFile.good(); ++i){
+      for (unsigned j=1; j <= 4; ++j){
+        myFile >> irisData.trainingSet.inputs(j, i)
+      }
+      for (unsigned j=1; j <= 3; ++j){
+        myFile >> irisData.trainingSet.inputs(j, i)
+      }
     }
-    for (unsigned j=1; j < 4; ++j){
-      trainingFile >> irisData.trainingSet.inputs(j, i)
-      getchar();
-    }
+
+    myFile.close();
   }
-
 
 }
 
