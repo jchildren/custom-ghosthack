@@ -1,67 +1,75 @@
 //main.cpp
 
 #include <iostream>
-#include <ifstream>
-#include <string>
+#include <cstdlib>
 #include <cmath>
 #include <Eigen/Core>
 
+matrixXd weightInitialisation(double maxWeight, int width, int height){
 
+  matrixXd weights(width, height);
 
-struct data{
-  MatrixXd inputs;
-  MatrixXi outputs;
-  unsigned classes;
-  unsigned count;
-  double bias;
-
-}
-
-struct dataSet{
-  unsigned inputCount;
-  unsigned outputCount;
-  data trainingSet;
-  data validationSet;
-  data testSet;
-}
-
-void readDataFiles(){
-  dataSet irisData;
-
-  const char filePath[20] = "../data/";
-
-  const std::string fileNames[3] =
-    {"iris_training.dat",
-    "iris_test.dat",
-    "iris_validation.dat"};
-
-  std::ifstream myFile;
-
-  for (unsigned f=1; f <= 3; ++f){
-
-    myFile.open (filePath + fileNames[f].c_str());
-
-    for (unsigned i=1; myFile.good(); ++i){
-      for (unsigned j=1; j <= 4; ++j){
-        myFile >> irisData.trainingSet.inputs(j, i)
-      }
-      for (unsigned j=1; j <= 3; ++j){
-        myFile >> irisData.trainingSet.inputs(j, i)
-      }
+  for (unsigned i=1; i <= width; ++i){
+    for (unsigned j=1; j <= height; ++j){
+      double f = (double)rand() / RAND_MAX;
+      weights(i, j) = f * (2 * maxWeight) - maxWeight;
     }
-
-    myFile.close();
   }
 
+  return weights;
 }
 
+void feedForward(MatrixXd inputMatrix, MatrixXd weightMatrix,
+                VectorXd biasMatrix, MatrixXd &outputMatrix,
+                MatrixXd &netMatrix){
+
+  MatrixXd concatenatedInput(inputMatrix.rows(), inputMatrix.cols() + 1);
+  concatenatedInput << inputMatrix, biasMatrix;
+
+  //net = mul(weights, horcat(inputs, bias))
+  //output = activate(net)
+
+  netMatrix = weightMatrix * concatenatedInput;
+  outputMatrix = activate(netMatrix);
+
+
+
+}
+
+void networkError(MatrixXd inputMatrix, MatrixXd weightMatrix,
+                VectorXd biasMatrix, MatrixXd targetOutputMatrix,
+                VectorXi targetClassVector, double error, double classError){
+
+  feedForward(inputMatrix weightMatrix, biasMatrix,
+    MatrixXd outputMatrix, Matrix netMatrix);
+
+  error = sum((targetOutputMatrix - outputMatrix)^2.0)
+    / (sample_count * output_count);
+
+  outputToClass(int n, outputMatrix, &classVector);
+
+  c = sum_all_components(classVector != targetClassVector)/sample_count;
+
+}
+
+matrixXd backPropogration(MatrixXd inputMatrix, MatrixXd weightMatrix,
+  double eta, VectorXd biasMatrix){
+
+  //currently dummy function
+  return weightMatrix;
+
+}
+
+void trainingFunction(){
+  
+}
 
 double activationFunction(double x){
-  return (tanh(x) + 1)/2;
+  return (tanh(x) + 1.0)/2.0;
 }
 
 double activationFunctionDerivative(double x){
-  return (1 - (tanh(x)**2))/2;
+  return (1.0 - (tanh(x)^2.0))/2.0;
 }
 
 void checkColumns(MatrixXi &Matrix, VectorXi &Vector){
@@ -71,7 +79,7 @@ void checkColumns(MatrixXi &Matrix, VectorXi &Vector){
   }
 }
 
-void outputToClass(int n, MatrixXi &outputMatrix, VectorXi &classVector){
+void outputToClass(int n, MatrixXi outputMatrix, VectorXi &classVector){
 
   checkColumns(outputMatrix, classVector);
 
@@ -84,7 +92,7 @@ void outputToClass(int n, MatrixXi &outputMatrix, VectorXi &classVector){
   }
 }
 
-void outputToMatrix(int n, MatrixXi &outputMatrix, VectorXi &classVector){
+void outputToMatrix(int n, MatrixXi &outputMatrix, VectorXi classVector){
 
   checkColumns(outputMatrix, classVector);
 
